@@ -80,6 +80,7 @@ class Lab:
         self.task: asyncio.Task | None = None
         self.capture: store.CaptureWriter | None = None
         self.last_error = ""
+        self._announced = False
 
     # --- state -------------------------------------------------------
     def state(self) -> dict:
@@ -110,6 +111,15 @@ class Lab:
                 except Exception:
                     pass
 
+    def _notify_call(self, function: str, *args) -> None:
+        """Fire a desktop notification if the notify module is available; never raise."""
+        try:
+            from . import notify
+
+            getattr(notify, function)(*args)
+        except Exception:
+            log.debug("notification %s failed", function, exc_info=True)
+
     # --- frames ------------------------------------------------------
     def _on_frame(self, frame) -> None:
         self.frames_total += 1
@@ -121,6 +131,7 @@ class Lab:
     # --- watch loop --------------------------------------------------
     def start_watch(self) -> None:
         self.watch = True
+        self._announced = False
         if self.capture is None:
             self.capture = store.CaptureWriter()
             self.capture.event("watch_started", mode="demo" if self.demo else "ble")
@@ -141,6 +152,9 @@ class Lab:
                     await self.client.connect()
                     await self.client.subscribe()
                     self.last_error = ""
+                    if not self._announced:
+                        self._announced = True
+                        self._notify_call("connected", self.client.address or "")
                     self._notify_state()
                 await asyncio.sleep(0.4)
             except asyncio.CancelledError:
@@ -180,6 +194,11 @@ class Lab:
                 await self.client.connect()
             result = await self.client.send_dvw(values, handshake=handshake)
             self.last_error = ""
+            att_ack = bool(result.get("att_ack"))
+            self._notify_call("profile_sent", values, att_ack)
+            peak = max(values) if values else 0
+            if peak >= 80:
+                self._notify_call("high_power", peak)
             return result
 
     async def shutdown(self) -> None:
@@ -235,8 +254,11 @@ async def api_connect(body: Optional[dict] = None) -> dict:
 
 @app.post("/api/disconnect")
 async def api_disconnect() -> dict:
+    was_connected = lab.client.connected
     lab.stop_watch()
     await lab.client.disconnect()
+    if was_connected:
+        lab._notify_call("disconnected")
     lab._notify_state()
     return {"ok": True}
 
@@ -344,6 +366,10 @@ async def api_wallpaper_preview(theme: str = "aurora", values: Optional[str] = N
 
 @app.get("/api/meta")
 async def api_meta() -> dict:
+    try:
+        from .wallpaper import THEME_NAMES
+    except Exception:
+        THEME_NAMES = ("aurora", "ember", "mono", "minimal")
     return {
         "version": "0.1.0",
         "protocol": {
@@ -356,7 +382,7 @@ async def api_meta() -> dict:
             "frame_layout": "[seq:u8][msg:u16 LE][flags:u8][len:u8][payload]",
         },
         "constants": {"min_w": proto.MIN_W, "max_w": proto.MAX_W, "points": proto.DVW_POINTS},
-        "themes": ["aurora", "ember", "mono", "minimal"],
+        "themes": list(THEME_NAMES),
     }
 
 

@@ -103,7 +103,7 @@ def fetch_state(url: str = DEFAULT_URL, timeout: float = FETCH_TIMEOUT) -> dict[
     """GET the state endpoint; returns None on any network/JSON error."""
     try:
         with urllib.request.urlopen(url, timeout=timeout) as response:  # noqa: S310 - localhost only
-            raw = response.read(65536)
+            raw = response.read(2 * 1024 * 1024)
         data = json.loads(raw.decode("utf-8"))
     except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, OSError, ValueError):
         return None
@@ -213,6 +213,7 @@ class Hud:
 
         self.window = Gtk.Window(application=self.app)
         self.window.set_title("Pasito Lab HUD")
+        self.window.set_size_request(CARD_WIDTH, -1)
         self.window.add_css_class("hud")
         try:
             self.window.set_decorated(False)

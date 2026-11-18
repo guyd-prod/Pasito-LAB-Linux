@@ -452,11 +452,20 @@ def render_image(
     accent = _rgba(palette["accent"])
     minimal = theme == "minimal"
 
-    pad = max(20, int(width * 0.045))
-    chart_left = pad
+    # Keep the composition readable down to the 320x200 minimum.
+    compact = width < 700 or height < 380
+    pad = max(12, int(width * 0.045))
+    chart_left = max(pad, 34) if not minimal and (compact or palette.get("grid")) else pad
     chart_right = width - pad
-    chart_top = height * (0.40 if minimal else 0.36)
-    axis_y = height * (0.80 if minimal else 0.82)
+    if minimal:
+        chart_top = height * 0.40
+        axis_y = height * 0.80
+    elif compact:
+        chart_top = height * 0.44
+        axis_y = height * 0.74
+    else:
+        chart_top = height * 0.36
+        axis_y = height * 0.82
     chart_bottom = axis_y
     top_value = max(MAX_W, max(vals))
     chart_h = max(40.0, chart_bottom - chart_top)
@@ -550,12 +559,15 @@ def render_image(
         fill=accent,
         width=max(2, int(round(3 * scale))),
     )
-    subtitle_font = _font(max(9, int(14 * scale)), mono=True)
-    subtitle = (
-        f"{palette['label'].upper()} · {len(vals)} POINTS · "
-        f"{DVW_STEP_SECONDS:.1f} S STEP · {MIN_W}–{MAX_W} W RANGE"
-    )
-    draw.text((pad, underline_y + max(10, int(16 * scale))), subtitle, font=subtitle_font, fill=muted, anchor="la")
+    if not compact:
+        subtitle_font = _font(max(9, int(14 * scale)), mono=True)
+        subtitle = (
+            f"{palette['label'].upper()} · {len(vals)} POINTS · "
+            f"{DVW_STEP_SECONDS:.1f} S STEP · {MIN_W}–{MAX_W} W RANGE"
+        )
+        draw.text(
+            (pad, underline_y + max(10, int(16 * scale))), subtitle, font=subtitle_font, fill=muted, anchor="la"
+        )
 
     _draw_meta(draw, _meta_pairs(meta), width, pad, scale, palette)
 
@@ -615,10 +627,12 @@ def apply_wallpaper(path) -> tuple[bool, str]:
     wallpaper = Path(path).expanduser()
     if not wallpaper.is_file():
         return False, f"файл обоев не найден: {wallpaper}"
+    # Compositors resolve image paths against their own cwd, so pass an absolute one.
+    absolute = wallpaper.resolve()
 
     candidates = (
-        ("omarchy", ("theme", "bg", "set", str(wallpaper)), "omarchy theme bg set"),
-        ("swww", ("img", str(wallpaper)), "swww img"),
+        ("omarchy", ("theme", "bg", "set", str(absolute)), "omarchy theme bg set"),
+        ("swww", ("img", str(absolute)), "swww img"),
     )
     reasons: list[str] = []
     for binary, arguments, readable in candidates:
@@ -707,8 +721,6 @@ def main(argv: list[str] | None = None) -> int:
         values = parse_values(args.values) if args.values is not None else _profile_values(args.profile)
         size = parse_size(args.size)
         meta = parse_meta(args.meta_json)
-        palette = _known_theme(args.theme)
-        del palette
     except ValueError as exc:
         print(f"ошибка: {exc}", file=sys.stderr)
         return 1
