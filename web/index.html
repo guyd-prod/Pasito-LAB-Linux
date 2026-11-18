@@ -1,114 +1,270 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pasito Lab — дашборд</title>
-<link rel="stylesheet" href="./style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Pasito Lab — локальный дашборд Smoant Pasito III: живой BLE-поток, DVW-кривая, профили и обои.">
+  <title>Pasito Lab · DVW-пульт</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2307100e'/%3E%3Cpath d='M16 5l9 11-9 11-9-11z' fill='none' stroke='%232dd4bf' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%232dd4bf'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
 </head>
 <body>
-<header class="topbar">
-  <div class="brand">
-    <div class="logo">PASITO<span>LAB</span></div>
-    <div class="tagline">SMOANT PASITO III · BLE WORKBENCH</div>
-  </div>
-  <div class="status">
-    <span id="conn-dot" class="dot off"></span>
-    <span id="conn-text">не подключено</span>
-    <span class="sep"></span>
-    <span id="device-name" class="mono">—</span>
-    <span id="frames-count" class="chip">0 кадров</span>
-  </div>
-  <div class="actions">
-    <button id="btn-connect" class="primary">Подключить</button>
-    <button id="btn-disconnect">Отключить</button>
-  </div>
-</header>
-
-<div id="banner" class="banner hidden"></div>
-
-<main>
-  <section class="panel curve-panel">
-    <div class="panel-head">
-      <h2>DVW-кривая</h2>
-      <span id="range-warn" class="warn hidden">значения вне 5–100 Вт</span>
-    </div>
-    <p class="hint">10 шагов по ~0.5 с, один байт ≈ ватты. Диапазон устройства 5–100 Вт.
-      Точки можно перетаскивать мышью.</p>
-    <canvas id="curve" height="240"></canvas>
-    <div id="points" class="points"></div>
-    <div class="row wrap">
-      <button id="btn-flat">Ровно 50 Вт</button>
-      <button id="btn-random">Случайная</button>
-      <span id="sum" class="mono dim"></span>
-    </div>
-    <div class="row">
-      <input id="profile-name" placeholder="Название профиля" maxlength="40">
-      <button id="btn-save-profile">Сохранить</button>
-    </div>
-    <div class="row">
-      <button id="btn-send" class="accent wide">Отправить на Pasito</button>
-    </div>
-    <div id="send-result" class="result hidden"></div>
-    <h3>Профили</h3>
-    <div id="profiles" class="profiles"><span class="dim">пока нет</span></div>
-  </section>
-
-  <section class="panel frames-panel">
-    <div class="panel-head">
-      <h2>Поток кадров</h2>
-      <div class="tools">
-        <select id="filter-msg"><option value="">все msg</option></select>
-        <input id="search" placeholder="поиск по HEX">
-        <button id="btn-pause">Пауза</button>
-        <a id="btn-export" class="button" href="/api/capture/download">JSONL</a>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">◈</span>
+        <div class="brand-text">
+          <h1>Pasito <span>Lab</span></h1>
+          <p>Smoant Pasito III · BLE-стенд</p>
+        </div>
       </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>время</th><th>seq</th><th>msg</th><th>flags</th><th>len</th><th>payload</th></tr>
-        </thead>
-        <tbody id="frames-body">
-          <tr><td colspan="6" class="dim center">кадров пока нет — нажмите «Подключить»</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div id="frame-detail" class="frame-detail hidden"></div>
-    <p class="legend">
-      <span class="badge state">0x035c state</span>
-      <span class="badge mode">0x0351 mode</span>
-      <span class="badge dvw">0x0370 dvw</span>
-      <span class="dim">!trunc — устройство объявило больше байт, чем доставил MTU</span>
-    </p>
-  </section>
+      <div class="topbar-meta">
+        <span class="server-chip" id="serverChip">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="serverChipText">сервер: проверка…</span>
+        </span>
+        <span class="version mono" id="versionLabel">v0.1.0</span>
+      </div>
+    </header>
 
-  <section class="panel wall-panel">
-    <div class="panel-head">
-      <h2>Обои из профиля</h2>
-      <select id="theme">
-        <option value="aurora">aurora</option>
-        <option value="ember">ember</option>
-        <option value="mono">mono</option>
-        <option value="minimal">minimal</option>
-      </select>
+    <div class="offline-banner" id="offlineBanner" role="alert" hidden>
+      <span class="offline-icon" aria-hidden="true">!</span>
+      <div class="offline-text">
+        <strong>Сервер не запущен</strong>
+        <span>Не удалось получить <code>/api/state</code>. Запустите <code>python -m pasito.cli serve</code> и повторите.</span>
+        <span class="offline-detail" id="offlineDetail"></span>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="offlineRetry" type="button">Повторить</button>
     </div>
-    <img id="wall-preview" alt="превью обоев" loading="lazy">
-    <div class="row wrap">
-      <button id="btn-wall-save">Сохранить PNG</button>
-      <button id="btn-wall-apply" class="accent">Поставить на рабочий стол</button>
-    </div>
-    <div id="wall-result" class="result hidden"></div>
-    <p class="hint">Обои генерируются на ПК по вашей кривой. На самом Pasito свои обои
-      загрузить нельзя: в прошивке только 24 готовых, канала загрузки нет.</p>
-  </section>
-</main>
 
-<footer>
-  <span id="capture-path" class="mono dim">журнал: —</span>
-  <span id="ws-state" class="dim">WS: соединение…</span>
-</footer>
+    <section class="statusbar" aria-label="Статус подключения">
+      <div class="status-link">
+        <span class="link-dot" id="linkDot" aria-hidden="true"></span>
+        <div class="status-link-text">
+          <span class="status-label">Соединение</span>
+          <strong id="linkText">Нет данных</strong>
+        </div>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Устройство</span>
+        <span class="device-line" id="deviceText">—</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">watch</span>
+        <span class="pill off" id="watchPill">off</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Кадров всего</span>
+        <span class="mono status-value" id="framesTotal">0</span>
+      </div>
+      <div class="status-item status-capture">
+        <span class="status-label">Захват</span>
+        <span class="mono capture-path" id="captureText" title="—">—</span>
+      </div>
+      <div class="status-error" id="errorBox">
+        <span class="status-label">Последняя ошибка</span>
+        <span class="error-text" id="errorText">—</span>
+      </div>
+      <div class="status-actions">
+        <button class="btn btn-primary" id="connectBtn" type="button">Connect</button>
+        <button class="btn btn-ghost" id="disconnectBtn" type="button">Disconnect</button>
+      </div>
+    </section>
 
-<script src="./app.js"></script>
+    <main class="layout">
+      <section class="panel frames-panel" aria-labelledby="framesTitle">
+        <header class="panel-head">
+          <div class="panel-title">
+            <h2 id="framesTitle">Поток кадров</h2>
+            <span class="live-badge" id="wsBadge" title="WebSocket /ws">
+              <span class="ws-dot" aria-hidden="true"></span>
+              <span id="wsText">WS: подключение…</span>
+            </span>
+          </div>
+          <div class="panel-tools">
+            <span class="count-chip" id="framesCount">0 / 200</span>
+            <button class="btn btn-ghost btn-sm" id="pauseBtn" type="button" aria-pressed="false">
+              <span class="btn-icon" id="pauseIcon" aria-hidden="true">❚❚</span>
+              <span id="pauseLabel">Пауза</span>
+            </button>
+            <button class="btn btn-ghost btn-sm" id="downloadBtn" type="button">Скачать JSONL</button>
+          </div>
+        </header>
+
+        <div class="frames-toolbar">
+          <label class="field-inline" for="msgFilter">
+            <span>msg</span>
+            <select id="msgFilter">
+              <option value="all">все</option>
+              <option value="0x035c">0x035c · state</option>
+              <option value="0x0351">0x0351 · mode</option>
+              <option value="0x0370">0x0370 · dvw</option>
+              <option value="other">другие</option>
+            </select>
+          </label>
+          <label class="search-field" for="hexSearch">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="hexSearch" type="search" placeholder="Поиск по HEX: 03 5c …" autocomplete="off" spellcheck="false">
+          </label>
+          <span class="filter-count" id="filterCount">показано 0</span>
+        </div>
+
+        <div class="table-wrap" id="tableWrap">
+          <table class="frames-table">
+            <colgroup>
+              <col class="col-time">
+              <col class="col-seq">
+              <col class="col-msg">
+              <col class="col-flags">
+              <col class="col-len">
+              <col class="col-payload">
+              <col class="col-status">
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col">Время</th>
+                <th scope="col">seq</th>
+                <th scope="col">msg</th>
+                <th scope="col">flags</th>
+                <th scope="col">len / decl</th>
+                <th scope="col">payload HEX</th>
+                <th scope="col">статус</th>
+              </tr>
+            </thead>
+            <tbody id="framesBody"></tbody>
+          </table>
+          <div class="table-empty" id="framesEmpty">
+            <span class="table-empty-icon" aria-hidden="true">⌁</span>
+            <span id="framesEmptyText">Кадров пока нет. Подключитесь к устройству — поток появится здесь автоматически.</span>
+          </div>
+        </div>
+
+        <footer class="panel-foot">
+          <span>Клик по строке — raw_hex и payload по байтам. Новые сверху, лимит 200.</span>
+          <span class="paused-hint" id="pausedHint" hidden>лента заморожена</span>
+        </footer>
+      </section>
+
+      <div class="side">
+        <section class="panel editor-panel" id="editorPanel" aria-labelledby="editorTitle">
+          <header class="panel-head">
+            <div class="panel-title">
+              <h2 id="editorTitle">DVW-кривая</h2>
+              <span class="profile-chip" id="activeProfileChip" hidden></span>
+            </div>
+            <span class="count-chip" id="rangeChip">5–100 Вт</span>
+          </header>
+
+          <div class="editor-body">
+            <div class="curve-inputs" id="curveInputs" role="group" aria-label="Значения DVW-кривой, 10 шагов"></div>
+            <div class="range-warning" id="rangeWarning" role="status" hidden></div>
+
+            <div class="chart-box">
+              <canvas id="curveCanvas" height="230" role="img" aria-label="График мощности DVW по шагам. Точки можно перетаскивать мышью."></canvas>
+            </div>
+            <p class="chart-hint">
+              <span>Перетащите точку мышью</span>
+              <span class="mono">1 шаг = 0,5 с</span>
+            </p>
+
+            <div class="editor-actions">
+              <button class="btn btn-ghost btn-sm" id="randomBtn" type="button">Случайная</button>
+              <div class="equal-group">
+                <label class="mini-label" for="equalN">N</label>
+                <input class="mini-input" id="equalN" type="number" value="30" min="5" max="100" step="1" inputmode="numeric">
+                <button class="btn btn-ghost btn-sm" id="equalBtn" type="button">Ровно N Вт</button>
+              </div>
+              <button class="btn btn-ghost btn-sm" id="fromProfileBtn" type="button" title="Загрузить выбранный профиль из списка">Из профиля</button>
+            </div>
+
+            <div class="send-block">
+              <div class="send-row">
+                <button class="btn btn-send" id="sendBtn" type="button">Отправить на Pasito</button>
+                <span class="endpoint-hint mono">POST /api/send</span>
+              </div>
+              <p class="send-warning">
+                <span class="warn-icon" aria-hidden="true">⚠</span>
+                Применение профиля экспериментальное — смотрите на экран устройства.
+              </p>
+              <div class="send-result" id="sendResult" aria-live="polite" hidden></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel profiles-panel" aria-labelledby="profilesTitle">
+          <header class="panel-head">
+            <div class="panel-title">
+              <h2 id="profilesTitle">Профили</h2>
+              <span class="count-chip" id="profilesCount">0</span>
+            </div>
+            <button class="icon-btn" id="profilesRefresh" type="button" title="Обновить профили" aria-label="Обновить профили">↻</button>
+          </header>
+
+          <form class="save-profile" id="saveProfileForm">
+            <div class="save-row">
+              <input class="text-input" id="profileName" name="name" type="text" placeholder="Имя профиля" maxlength="80" autocomplete="off">
+              <button class="btn btn-primary btn-sm" id="saveProfileBtn" type="submit">Сохранить кривую</button>
+            </div>
+            <input class="text-input" id="profileNote" name="note" type="text" placeholder="Заметка (необязательно)" maxlength="200" autocomplete="off">
+          </form>
+
+          <div class="profile-list-wrap">
+            <ul class="profile-list" id="profileList"></ul>
+            <div class="empty-note" id="profilesEmpty">Профилей пока нет. Сохраните текущую кривую — она появится здесь.</div>
+          </div>
+        </section>
+
+        <section class="panel wallpaper-panel" aria-labelledby="wallpaperTitle">
+          <header class="panel-head">
+            <div class="panel-title">
+              <h2 id="wallpaperTitle">Обои</h2>
+              <span class="count-chip">превью 900×506</span>
+            </div>
+            <span class="muted-note">PNG · 2560×1440</span>
+          </header>
+
+          <div class="theme-row" id="themeRow" role="group" aria-label="Тема обоев">
+            <button class="theme-btn is-active" type="button" data-theme="aurora" aria-pressed="true">
+              <span class="theme-dot theme-aurora" aria-hidden="true"></span>Aurora
+            </button>
+            <button class="theme-btn" type="button" data-theme="ember" aria-pressed="false">
+              <span class="theme-dot theme-ember" aria-hidden="true"></span>Ember
+            </button>
+            <button class="theme-btn" type="button" data-theme="mono" aria-pressed="false">
+              <span class="theme-dot theme-mono" aria-hidden="true"></span>Mono
+            </button>
+            <button class="theme-btn" type="button" data-theme="minimal" aria-pressed="false">
+              <span class="theme-dot theme-minimal" aria-hidden="true"></span>Minimal
+            </button>
+          </div>
+
+          <div class="preview-wrap" id="previewWrap">
+            <img id="wallpaperPreview" alt="Предпросмотр обоев" draggable="false">
+            <div class="preview-state" id="previewLoading"><span class="spinner" aria-hidden="true"></span>рендер…</div>
+            <div class="preview-state preview-error" id="previewError" hidden>Предпросмотр недоступен</div>
+          </div>
+
+          <div class="wallpaper-actions">
+            <button class="btn btn-ghost" id="wallpaperSave" type="button">Сохранить обои</button>
+            <button class="btn btn-primary" id="wallpaperApply" type="button">Поставить на рабочий стол</button>
+          </div>
+          <div class="wallpaper-result" id="wallpaperResult" aria-live="polite" hidden></div>
+          <p class="panel-note">
+            Превью перегенерируется при изменении кривой или темы. Применение — через <code>omarchy theme bg set</code>.
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <span>Pasito Lab Linux · интерфейс без внешних зависимостей</span>
+      <span>Профиль экспериментальный — сверяйтесь с экраном устройства</span>
+      <span class="mono" id="footerVersion">v0.1.0</span>
+    </footer>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
 </body>
 </html>

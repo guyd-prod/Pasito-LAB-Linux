@@ -178,9 +178,9 @@ def captured_send(monkeypatch):
 
 
 def test_connected_event(captured_send):
-    assert notify.connected("41:42:FD:6A:53:2B") is True
+    assert notify.connected("41:42:FD:AA:BB:CC") is True
     call = captured_send[0]
-    assert "41:42:FD:6A:53:2B" in call["body"]
+    assert "41:42:FD:AA:BB:CC" in call["body"]
     assert call["urgency"] == "low"
     assert call["sound"] == "device-added"
 
@@ -243,7 +243,7 @@ class _StateHandler(BaseHTTPRequestHandler):
             body = json.dumps(
                 {
                     "connected": True,
-                    "address": "41:42:FD:6A:53:2B",
+                    "address": "41:42:FD:AA:BB:CC",
                     "name": "LE-S052",
                     "watch": True,
                     "frames_total": 42,
@@ -318,7 +318,7 @@ def test_hud_describe_state_with_frame():
     state = {
         "connected": True,
         "name": "LE-S052",
-        "address": "41:42:FD:6A:53:2B",
+        "address": "41:42:FD:AA:BB:CC",
         "frames_total": 42,
         "frames": [
             {"msg_name": "state", "seq": 10, "payload_hex": "00 3f 5c 01", "truncated": True},

@@ -4,7 +4,7 @@ import pytest
 
 from pasito import proto
 
-# Real notification, captured 2026-11-18 from 41:42:FD:6A:53:2B (seq=0x0a):
+# Real notification, captured 2026-11-18 from 41:42:FD:AA:BB:CC (seq=0x0a):
 # declared_len 29 but only 30 bytes total arrived -> truncated by MTU 33.
 RAW_STATE = "0a 5c 03 00 1d 00 3f 5c 37 04 57 5f 00 00 3f 00 00 00 ff ff 1f 00 32 2a 00 00 ff 0f 00 00"
 RAW_MODE = "0b 51 03 00 02 00 00"

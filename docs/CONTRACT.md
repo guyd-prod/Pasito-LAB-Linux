@@ -67,7 +67,7 @@ JSON кадра (ровно в таком виде отдаёт сервер и 
 State:
 
 ```json
-{"connected": true, "address": "41:42:FD:6A:53:2B", "name": "LE-S052", "watch": true,
+{"connected": true, "address": "41:42:FD:AA:BB:CC", "name": "LE-S052", "watch": true,
  "frames_total": 42, "frames": [Frame...] (<=200, новые первыми),
  "profiles": [Profile], "capture_file": "/home/.../session-....jsonl", "last_error": ""}
 ```

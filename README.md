@@ -10,7 +10,7 @@
 
 ## Что подтверждено на живом устройстве
 
-Снято с реального Pasito III (`LE-S052`, `41:42:FD:6A:53:2B`):
+Снято с реального Pasito III (`LE-S052`, `41:42:FD:AA:BB:CC`):
 
 - BLE-сервис один: `6e400001-b5a3-f393-e0a9-e50e24dcca9d` (клон Nordic UART с `9D` на конце);
   характеристики `0002` write-without-response, `0003` notify, `0004` read/write.
