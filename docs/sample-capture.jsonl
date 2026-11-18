@@ -1,0 +1,7 @@
+{"kind": "event", "event": "session_started", "t": "2026-11-18T16:02:00+03:00", "address": "41:42:FD:6A:53:2B"}
+{"kind": "frame", "t": 0.0, "seq": 10, "msg": 860, "msg_name": "state", "flags": 0, "declared_len": 29, "payload_hex": "00 3f 5c 37 04 57 5f 00 00 3f 00 00 00 ff ff 1f 00 32 2a 00 00 ff 0f 00 00", "raw_hex": "0a 5c 03 00 1d 00 3f 5c 37 04 57 5f 00 00 3f 00 00 00 ff ff 1f 00 32 2a 00 00 ff 0f 00 00", "truncated": true}
+{"kind": "frame", "t": 1.0, "seq": 11, "msg": 849, "msg_name": "mode", "flags": 0, "declared_len": 2, "payload_hex": "00 00", "raw_hex": "0b 51 03 00 02 00 00", "truncated": false}
+{"kind": "frame", "t": 2.0, "seq": 12, "msg": 880, "msg_name": "dvw", "flags": 0, "declared_len": 4, "payload_hex": "01 18 b4 41", "raw_hex": "0c 70 03 00 04 01 18 b4 41", "truncated": false}
+{"kind": "frame", "t": 3.0, "seq": 13, "msg": 860, "msg_name": "state", "flags": 0, "declared_len": 29, "payload_hex": "00 3f 5c 37 04 57 5f 00 00 3f 00 00 00 ff ff 1f 00 32 2a 00 00 ff 0f 00 00", "raw_hex": "0d 5c 03 00 1d 00 3f 5c 37 04 57 5f 00 00 3f 00 00 00 ff ff 1f 00 32 2a 00 00 ff 0f 00 00", "truncated": true}
+{"kind": "frame", "t": 4.0, "seq": 14, "msg": 849, "msg_name": "mode", "flags": 0, "declared_len": 2, "payload_hex": "00 00", "raw_hex": "0e 51 03 00 02 00 00", "truncated": false}
+{"kind": "frame", "t": 5.0, "seq": 15, "msg": 880, "msg_name": "dvw", "flags": 0, "declared_len": 4, "payload_hex": "01 18 b4 41", "raw_hex": "0f 70 03 00 04 01 18 b4 41", "truncated": false}

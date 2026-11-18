@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pasito Lab — дашборд</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">PASITO<span>LAB</span></div>
+    <div class="tagline">SMOANT PASITO III · BLE WORKBENCH</div>
+  </div>
+  <div class="status">
+    <span id="conn-dot" class="dot off"></span>
+    <span id="conn-text">не подключено</span>
+    <span class="sep"></span>
+    <span id="device-name" class="mono">—</span>
+    <span id="frames-count" class="chip">0 кадров</span>
+  </div>
+  <div class="actions">
+    <button id="btn-connect" class="primary">Подключить</button>
+    <button id="btn-disconnect">Отключить</button>
+  </div>
+</header>
+
+<div id="banner" class="banner hidden"></div>
+
+<main>
+  <section class="panel curve-panel">
+    <div class="panel-head">
+      <h2>DVW-кривая</h2>
+      <span id="range-warn" class="warn hidden">значения вне 5–100 Вт</span>
+    </div>
+    <p class="hint">10 шагов по ~0.5 с, один байт ≈ ватты. Диапазон устройства 5–100 Вт.
+      Точки можно перетаскивать мышью.</p>
+    <canvas id="curve" height="240"></canvas>
+    <div id="points" class="points"></div>
+    <div class="row wrap">
+      <button id="btn-flat">Ровно 50 Вт</button>
+      <button id="btn-random">Случайная</button>
+      <span id="sum" class="mono dim"></span>
+    </div>
+    <div class="row">
+      <input id="profile-name" placeholder="Название профиля" maxlength="40">
+      <button id="btn-save-profile">Сохранить</button>
+    </div>
+    <div class="row">
+      <button id="btn-send" class="accent wide">Отправить на Pasito</button>
+    </div>
+    <div id="send-result" class="result hidden"></div>
+    <h3>Профили</h3>
+    <div id="profiles" class="profiles"><span class="dim">пока нет</span></div>
+  </section>
+
+  <section class="panel frames-panel">
+    <div class="panel-head">
+      <h2>Поток кадров</h2>
+      <div class="tools">
+        <select id="filter-msg"><option value="">все msg</option></select>
+        <input id="search" placeholder="поиск по HEX">
+        <button id="btn-pause">Пауза</button>
+        <a id="btn-export" class="button" href="/api/capture/download">JSONL</a>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>время</th><th>seq</th><th>msg</th><th>flags</th><th>len</th><th>payload</th></tr>
+        </thead>
+        <tbody id="frames-body">
+          <tr><td colspan="6" class="dim center">кадров пока нет — нажмите «Подключить»</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="frame-detail" class="frame-detail hidden"></div>
+    <p class="legend">
+      <span class="badge state">0x035c state</span>
+      <span class="badge mode">0x0351 mode</span>
+      <span class="badge dvw">0x0370 dvw</span>
+      <span class="dim">!trunc — устройство объявило больше байт, чем доставил MTU</span>
+    </p>
+  </section>
+
+  <section class="panel wall-panel">
+    <div class="panel-head">
+      <h2>Обои из профиля</h2>
+      <select id="theme">
+        <option value="aurora">aurora</option>
+        <option value="ember">ember</option>
+        <option value="mono">mono</option>
+        <option value="minimal">minimal</option>
+      </select>
+    </div>
+    <img id="wall-preview" alt="превью обоев" loading="lazy">
+    <div class="row wrap">
+      <button id="btn-wall-save">Сохранить PNG</button>
+      <button id="btn-wall-apply" class="accent">Поставить на рабочий стол</button>
+    </div>
+    <div id="wall-result" class="result hidden"></div>
+    <p class="hint">Обои генерируются на ПК по вашей кривой. На самом Pasito свои обои
+      загрузить нельзя: в прошивке только 24 готовых, канала загрузки нет.</p>
+  </section>
+</main>
+
+<footer>
+  <span id="capture-path" class="mono dim">журнал: —</span>
+  <span id="ws-state" class="dim">WS: соединение…</span>
+</footer>
+
+<script src="./app.js"></script>
+</body>
+</html>
