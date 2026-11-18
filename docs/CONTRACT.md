@@ -57,11 +57,14 @@ JSON кадра (ровно в таком виде отдаёт сервер и 
 - `POST /api/profiles` body `{"name","values","note"}` → Profile
 - `PUT /api/profiles/{id}` body `{"name","values","note"}` → Profile
 - `DELETE /api/profiles/{id}` → `{"ok": true}`
-- `POST /api/send` body `{"values":[...]}` или `{"profile_id":"..."}` → `{"ok":bool,"att_ack":bool,"detail":str,"raw":hex}`
+- `POST /api/send` body `{"values":[...]}` или `{"profile_id":"..."}` → `{"ok":bool,"att_ack":bool,"detail":str,"raw":hex,"read_back":hex}`
+  `att_ack`/`detail` означают только успех ATT-записи в стеке BLE, **не применение профиля на устройстве**;
+  `read_back` — что вернул `0004` сразу после записи (эхо/статус; может быть пустым).
 - `GET /api/capture/download` → файл JSONL (`text/plain`, attachment)
 - `POST /api/wallpaper` body `{"values":[...]}|{"profile_id":"..."}, "theme":"aurora", "apply":false` → `{"path":str,"applied":bool,"detail":str}`
 - `GET /api/wallpaper/preview.png?theme=aurora&values=20,25,...` → `image/png` 900×506
 - `GET /api/meta` → `{"protocol":{"service":..., "chars":{...}}, "constants":{"min_w":5,"max_w":100}, "themes":["aurora","ember","mono","minimal"], "version":"0.1.0"}`
+  опционален для UI: без него дашборд берёт дефолты (5–100 Вт, 4 темы).
 - `WS /ws` → сервер шлёт `{"type":"hello","state":State}`, `{"type":"state","state":State}`, `{"type":"frame","frame":Frame}`
 
 State:
