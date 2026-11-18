@@ -1,24 +1,69 @@
-# Pasito Lab Linux
+<p align="center">
+  <img src="assets/brand/banner.png" alt="Pasito Lab Linux — BLE-стенд для Smoant Pasito III" width="100%">
+</p>
 
-Открытый Linux-инструментарий для BLE-вейпа **Smoant Pasito III (S052)**: сканер, живой поток
-кадров, декодер протокола, чтение/запись 512-байтового буфера `0004`, редактор DVW-кривой,
-веб-дашборд, обои рабочего стола из профиля, уведомления и HUD-оверлей.
+<h1 align="center">Pasito Lab Linux</h1>
 
+<p align="center">
+  <b>BLE-стенд для Smoant Pasito III (S052)</b>: реверс протокола, живой поток кадров, DVW-редактор,<br>
+  генератор обоев, HUD-оверлей и утилиты для аппаратного разбора.
+</p>
+
+<p align="center">
+  <a href="https://github.com/guyd-prod/Pasito-LAB-Linux/actions/workflows/tests.yml"><img alt="tests" src="https://github.com/guyd-prod/Pasito-LAB-Linux/actions/workflows/tests.yml/badge.svg"></a>
+  <img alt="python" src="https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white">
+  <img alt="platform" src="https://img.shields.io/badge/platform-Linux-FCC624?logo=linux&logoColor=black">
+  <img alt="ble" src="https://img.shields.io/badge/BLE-bleak-2dd4bf">
+  <img alt="api" src="https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white">
+  <img alt="license" src="https://img.shields.io/badge/license-%D0%BD%D0%B5%20%D1%83%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD%D0%B0-lightgrey">
+</p>
+
+---
+
+## Скриншоты
+
+**Дашборд** — живой поток кадров, DVW-кривая с перетаскиванием точек, профили, отправка на устройство:
+
+<p align="center">
+  <img src="docs/images/dashboard.png" alt="Дашборд Pasito Lab: поток кадров и редактор DVW-кривой" width="100%">
+</p>
+
+**Обои** — генерируются из вашей кривой прямо в браузере и ставятся на рабочий стол:
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/dashboard-wallpaper.png" alt="Панель обоев в дашборде"></td>
+    <td width="50%"><img src="docs/images/wallpaper-aurora.png" alt="Сгенерированные обои, тема aurora"></td>
+  </tr>
+</table>
+
+**Архитектура**
+
+<p align="center">
+  <img src="docs/images/architecture.svg" alt="Архитектура проекта" width="100%">
+</p>
+
+## Что это
+
+Linux-инструментарий для BLE-вейпа **Smoant Pasito III (S052)**, заменяющий
+macOS-лабораторию и добавляющий работу на Linux (BlueZ), веб-дашборд, генератор обоев,
+HUD и демо-режим без устройства.
+
+Всё, что заявлено, подтверждено на живом устройстве: скан, подключение, подписка на `0003`,
+приём кадров, чтение/запись 512-байтового буфера `0004`, отправка DVW-профиля.
 
 ## Что подтверждено на живом устройстве
 
-Снято с реального Pasito III (`LE-S052`, `41:42:FD:AA:BB:CC`):
-
 - BLE-сервис один: `6e400001-b5a3-f393-e0a9-e50e24dcca9d` (клон Nordic UART с `9D` на конце);
   характеристики `0002` write-without-response, `0003` notify, `0004` read/write.
-- После подписки на `0003` устройство **само** присылает три кадра: `0x035c` (state), `0x0351`
-  (mode), `0x0370` (dvw). Формат: `[seq:u8][msg:u16][flags:u8][len:u8][payload]`.
-- `0004` — **буфер 512 байт** (в репозитории-предшественнике считали, что там 2 байта).
+- После подписки на `0003` устройство **само** присылает три кадра: `0x035c` (state),
+  `0x0351` (mode), `0x0370` (dvw).
+- `0004` — **буфер 512 байт**, а не двухбайтовое поле.
 - Сессию устройство закрывает само: ~13 с простоя или сразу после чтения `0004`.
 - Реклама: manufacturer ID `0x0642` = **Bluetrum**, service data `00003802` = MAC устройства.
 - Кадр DVW-профиля: `02` + 10 байт, 1 байт ≈ ватты (диапазон 5–100 Вт).
-- Официального приложения, DFU/OTA-сервиса и файлов прошивки у Pasito III нет; экран — 1.3" TFT
-  с 24 готовыми обоями, но канала для загрузки своих обоев на устройство не существует.
+- Официального приложения и OTA/DFU у Pasito III нет; экран — 1.3" TFT с 24 готовыми обоями,
+  но канала загрузки своих обоев на устройство не существует.
 
 Полный разбор и открытые вопросы: [docs/PROTOCOL.md](docs/PROTOCOL.md).
 
@@ -34,54 +79,44 @@
 | Редактор 10 точек + профили (сохранение/загрузка) | дашборд, `pasito profile` |
 | Обои рабочего стола из кривой (4 темы) | `pasito wallpaper`, `/api/wallpaper` |
 | Уведомления и звуки | `pasito.notify` |
-| HUD-оверлей поверх окон (GTK4 layer-shell) | `pasito hud` || Демо-режим без устройства (реплей реальных кадров) | `pasito serve --demo` |
-
-## Установка
-
-```sh
-cd ~/Projects/pasito-lab-linux
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-```
-
-Требования: Linux + BlueZ 5.5x+, Python 3.11+, для оверлея — GTK4 и `gtk4-layer-shell`
-(на Omarchy/Arch уже есть). Root не нужен.
+| HUD-оверлей поверх окон (GTK4 layer-shell) | `pasito hud` |
+| Демо-режим без устройства (реплей реальных кадров) | `pasito serve --demo` |
+| Разбор дампа флеша (ресурсы `ENTR`, картинки) | `scripts/analyze_dump.py` |
 
 ## Быстрый старт
 
-1. **Разбудите Pasito**: BLE включается вместе с экраном. Держите устройство включённым
-   (экран/меню Bluetooth/Share) — иначе сканер его не увидит.
-2. Проверьте связь:
-
 ```sh
-./run.sh scan                 # должен найтись LE-S052 с RSSI и manufacturer data
-./run.sh watch                # живой поток кадров; Ctrl+C — выход
+git clone https://github.com/guyd-prod/Pasito-LAB-Linux.git
+cd Pasito-LAB-Linux
+
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+
+./run.sh scan      # найти LE-S052 (Pasito должен быть разбужен: экран → меню Bluetooth/Share)
+./run.sh watch     # живой поток кадров в терминале
+./run.sh serve     # дашборд: http://127.0.0.1:8787
+./run.sh serve --demo   # дашборд без устройства, на реплее реальных кадров
 ```
 
-3. Запустите дашборд:
+Требования: Linux + BlueZ 5.5x+, Python 3.11+. Root не нужен.
 
-```sh
-./run.sh serve                # http://127.0.0.1:8787
-```
+## Протокол
 
-Откройте `http://127.0.0.1:8787`, нажмите **Connect** — дашборд сам будет переподключаться,
-когда устройство закрывает сессию. Без устройства:
+Кадр notify `6e400003`:
 
-```sh
-./run.sh serve --demo         # dashboard на реплее реальных кадров
-```
+<p align="center">
+  <img src="docs/images/frame-format.svg" alt="Формат кадра notify" width="100%">
+</p>
 
-4. Сгенерируйте обои из кривой и поставьте на рабочий стол:
+| Кадр | msg | declared_len | payload (факт) | Повторяемость |
+|---|---|---|---|---|
+| state | `0x035c` | 29 | 25 | байт-в-байт одинаков между сессиями |
+| mode | `0x0351` | 2 | 2 | `00 00` |
+| dvw | `0x0370` | 4 | 4 | `01 18 b4 41` |
 
-```sh
-./run.sh wallpaper --values 20,30,40,50,60,70,80,90,100,100 --theme aurora --apply
-```
-
-5. Отправьте свой DVW-профиль (экспериментально, смотрите на экран устройства):
-
-```sh
-./run.sh dvw send --values 20,30,40,50,60,70,80,90,100,100
-```
+Большой кадр приходит усечённым (ATT MTU = 33): 5 байт заголовка + 25 payload, хотя объявлено 29.
+Семантика полей payload ещё не расшифрована — см. план экспериментов в
+[docs/PROTOCOL.md](docs/PROTOCOL.md).
 
 ## CLI
 
@@ -99,14 +134,18 @@ pasito serve           [--port 8787] [--demo]
 pasito hud             [--url http://127.0.0.1:8787/api/state]
 ```
 
-## Дашборд
+## Обои, уведомления, HUD
 
-Одностраничный интерфейс без внешних зависимостей: статус связи, живая таблица кадров (фильтры,
-поиск по HEX, пауза, JSONL-экспорт), редактор DVW-кривой с графиком и профилями, отправка на
-устройство, превью и применение обоев. Работает и в демо-режиме.
+```sh
+./run.sh wallpaper --values 20,30,40,50,60,70,80,90,100,100 --theme aurora --apply
+./run.sh hud --url http://127.0.0.1:8787/api/state
+```
 
-REST/WebSocket API заморожен в [docs/CONTRACT.md](docs/CONTRACT.md): `/api/state`, `/api/frames`,
-`/api/connect`, `/api/send`, `/api/profiles`, `/api/wallpaper/preview.png`, `/ws`.
+- Обои: 4 темы (`aurora`, `ember`, `mono`, `minimal`), PNG 2560×1440, применение через
+  `omarchy theme bg set` (fallback — `swww`).
+- Уведомления: `notify-send` (quickshell), звуки — canberra/paplay; события подключения,
+  отключения, отправки профиля и высокого пика мощности.
+- HUD: GTK4-оверлей через `gtk4-layer-shell`, fallback — окно без декора; опрос `/api/state` раз в секунду.
 
 ## Данные
 
@@ -116,22 +155,23 @@ REST/WebSocket API заморожен в [docs/CONTRACT.md](docs/CONTRACT.md): `
 ~/.local/share/pasito-lab/wallpapers/*.png       сгенерированные обои
 ```
 
-## Демо-режим
+## Тесты и CI
 
-`PASITO_DEMO=1` или `pasito serve --demo` — сервер не трогает Bluetooth, а проигрывает реальные
-кадры устройства (state/mode/dvw) с растущим `seq`. Нужен для разработки UI, скриншотов и
-проверки дашборда, когда Pasito спит.
+- `pytest` — **96 тестов**, покрывают протокол, хранение, обои, уведомления и HUD-хелперы.
+- GitHub Actions (`tests`) гоняет их на Python 3.11/3.12/3.13 и делает smoke-тест CLI.
 
-## Проверено на этой машине (2026-11-18)
+```sh
+PASITO_NOTIFY=0 .venv/bin/python -m pytest tests/ -q
+```
 
-- 96 тестов `pytest` зелёные.
-- Сканер нашёл живой Pasito (RSSI −66 dBm), manufacturer data и service data совпали.
-- BLE-клиент подключался, подписывался и принимал реальные кадры; чтение/запись `0004` проверены.
-- Дашборд отдаётся на `127.0.0.1:8787`, REST и WebSocket отвечают, превью обоев генерируется.
-- Обои применяются через `omarchy theme bg set` (проверено с возвратом исходного фона).
-- Уведомления через quickshell работают; звук — canberra/paplay.
-- HUD: в текущей сессии композитор не отдаёт layer-shell (`is_supported()` → False), поэтому
-  оверлей открывается обычным окном без декора — это штатный fallback, код готов к layer-shell.
+## Аппаратный путь: обои на самом устройстве
+
+Свои обои на Pasito загрузить по BLE нельзя, но есть аппаратный путь: дамп SPI-флеша,
+ресурсный blob Bluetrum `ENTR` (32-байтовые записи: имя/адрес/длина, XIP с `0x11000000`),
+сырые RGB565-картинки. Пошаговый гид, безопасность, BOM и анализатор дампа:
+
+- [docs/HARDWARE.md](docs/HARDWARE.md)
+- [scripts/analyze_dump.py](scripts/analyze_dump.py)
 
 ## Безопасность и ограничения
 
@@ -139,7 +179,7 @@ REST/WebSocket API заморожен в [docs/CONTRACT.md](docs/CONTRACT.md): `
   а не что устройство применило профиль. Проверяйте экран Pasito.
 - Значения мощности держите в 5–100 Вт; кодирование допускает 0–255, но это не диапазон устройства.
 - Не запускайте одновременно несколько клиентов к одному адаптеру/устройству.
-- Обои — на **ПК**; загрузить свои обои в Pasito нельзя (нет канала/DFU/приложения).
+- Обои на ПК — да; загрузка своих обоев в Pasito — только через прошивку флеша (с рисками).
 - Эксперименты — только со своим устройством.
 
 ## Troubleshooting
@@ -155,17 +195,24 @@ REST/WebSocket API заморожен в [docs/CONTRACT.md](docs/CONTRACT.md): `
 ## Структура
 
 ```text
-pasito/proto.py      протокол: UUID, кадры, DVW-кодек
-pasito/ble.py        async-клиент bleak: скан/подключение/подписка/запись
-pasito/store.py      профили, журналы, пути данных
-pasito/cli.py        CLI
-pasito/server.py     FastAPI + WebSocket + демо-режим
-pasito/wallpaper.py  генератор обоев (PIL) + применение
-pasito/notify.py     уведомления и звуки
-pasito/hud.py        GTK4-оверлей (layer-shell)
-web/                 дашборд (vanilla JS)
-docs/CONTRACT.md     API и модели
-docs/PROTOCOL.md     результаты реверса протокола
-docs/sample-capture.jsonl  реальный захват кадров
-tests/               pytest
+pasito/proto.py       протокол: UUID, кадры, DVW-кодек
+pasito/ble.py         async-клиент bleak: скан/подключение/подписка/запись
+pasito/store.py       профили, журналы, пути данных
+pasito/cli.py         CLI
+pasito/server.py      FastAPI + WebSocket + демо-режим
+pasito/wallpaper.py   генератор обоев (PIL) + применение
+pasito/notify.py      уведомления и звуки
+pasito/hud.py         GTK4-оверлей (layer-shell)
+web/                  дашборд (vanilla JS)
+scripts/              analyze_dump.py (ENTR/картинки), make_branding.py (баннер, логотип)
+docs/CONTRACT.md      API и модели
+docs/PROTOCOL.md      результаты реверса протокола
+docs/HARDWARE.md      аппаратный путь к своим обоям
+docs/images/          скриншоты и схемы
+assets/brand/         баннер, логотип, social preview
+tests/                pytest
 ```
+
+## Лицензия
+
+Лицензия пока не указана. Если планируете переиспользование — откройте issue или добавьте MIT.

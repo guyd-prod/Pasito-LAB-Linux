@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430" role="img" aria-label="Архитектура Pasito Lab Linux">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2dd4bf"/>
+    </marker>
+    <marker id="arrow-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="430" rx="18" fill="#0d1117" stroke="#1f2937"/>
+  <text x="40" y="46" fill="#e6edf5" font-family="'Inter',system-ui,sans-serif" font-size="19" font-weight="700">Архитектура</text>
+  <text x="40" y="70" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="12">Python · Linux/BlueZ · без root</text>
+
+  <!-- device -->
+  <rect x="40" y="104" width="250" height="150" rx="14" fill="#0e2a28" stroke="#2dd4bf" stroke-width="1.6"/>
+  <text x="165" y="136" text-anchor="middle" fill="#5eead4" font-family="'Inter',system-ui,sans-serif" font-size="15" font-weight="700">Smoant Pasito III</text>
+  <text x="165" y="160" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">BLE-периферия</text>
+  <text x="165" y="182" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">6e400001…CCA9D</text>
+  <text x="165" y="202" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">0002 / 0003 / 0004</text>
+  <text x="165" y="230" text-anchor="middle" fill="#5eead4" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">Bluetrum · S052</text>
+
+  <!-- bleak -->
+  <rect x="350" y="104" width="230" height="150" rx="14" fill="#101f30" stroke="#60a5fa" stroke-width="1.6"/>
+  <text x="465" y="136" text-anchor="middle" fill="#93c5fd" font-family="'Inter',system-ui,sans-serif" font-size="15" font-weight="700">bleak</text>
+  <text x="465" y="160" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">async BLE-клиент</text>
+  <text x="465" y="182" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">скан · подписка</text>
+  <text x="465" y="202" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">чтение/запись 0004</text>
+  <text x="465" y="230" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">авто-реконнект</text>
+
+  <!-- server -->
+  <rect x="640" y="104" width="250" height="150" rx="14" fill="#241d0e" stroke="#fbbf24" stroke-width="1.6"/>
+  <text x="765" y="136" text-anchor="middle" fill="#fcd34d" font-family="'Inter',system-ui,sans-serif" font-size="15" font-weight="700">FastAPI + WS</text>
+  <text x="765" y="160" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">:8787 · /api/*</text>
+  <text x="765" y="182" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">/ws · demo-режим</text>
+  <text x="765" y="202" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">профили · JSONL</text>
+  <text x="765" y="230" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">read-control</text>
+
+  <!-- web -->
+  <rect x="950" y="104" width="210" height="150" rx="14" fill="#1b1426" stroke="#c084fc" stroke-width="1.6"/>
+  <text x="1055" y="136" text-anchor="middle" fill="#d8b4fe" font-family="'Inter',system-ui,sans-serif" font-size="15" font-weight="700">web/</text>
+  <text x="1055" y="160" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">vanilla JS</text>
+  <text x="1055" y="182" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">кадры · кривая</text>
+  <text x="1055" y="202" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">профили · обои</text>
+
+  <!-- arrows -->
+  <line x1="294" y1="179" x2="344" y2="179" stroke="#2dd4bf" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="584" y1="179" x2="634" y2="179" stroke="#2dd4bf" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="894" y1="179" x2="944" y2="179" stroke="#2dd4bf" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- bottom row -->
+  <rect x="40" y="300" width="250" height="94" rx="12" fill="#11161f" stroke="#334155"/>
+  <text x="165" y="328" text-anchor="middle" fill="#cbd5e1" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="12">pasito.cli</text>
+  <text x="165" y="350" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">scan · watch · capture</text>
+  <text x="165" y="370" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">dvw send · profile</text>
+
+  <rect x="350" y="300" width="230" height="94" rx="12" fill="#11161f" stroke="#334155"/>
+  <text x="465" y="328" text-anchor="middle" fill="#cbd5e1" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="12">wallpaper.py</text>
+  <text x="465" y="350" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">PIL · 4 темы</text>
+  <text x="465" y="370" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">omarchy theme bg set</text>
+
+  <rect x="640" y="300" width="250" height="94" rx="12" fill="#11161f" stroke="#334155"/>
+  <text x="765" y="328" text-anchor="middle" fill="#cbd5e1" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="12">hud.py · notify.py</text>
+  <text x="765" y="350" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">GTK4 layer-shell overlay</text>
+  <text x="765" y="370" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">notify-send · canberra</text>
+
+  <rect x="950" y="300" width="210" height="94" rx="12" fill="#11161f" stroke="#334155"/>
+  <text x="1055" y="328" text-anchor="middle" fill="#cbd5e1" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="12">scripts/</text>
+  <text x="1055" y="350" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">analyze_dump.py — ENTR</text>
+  <text x="1055" y="370" text-anchor="middle" fill="#8b97a8" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="11">make_branding.py</text>
+
+  <line x1="165" y1="254" x2="165" y2="294" stroke="#475569" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow-dim)"/>
+  <line x1="465" y1="254" x2="465" y2="294" stroke="#475569" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow-dim)"/>
+  <line x1="765" y1="254" x2="765" y2="294" stroke="#475569" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow-dim)"/>
+  <line x1="1055" y1="254" x2="1055" y2="294" stroke="#475569" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow-dim)"/>
+</svg>
