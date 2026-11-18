@@ -177,6 +177,13 @@ class Lab:
                 await asyncio.sleep(0.07)
             await asyncio.sleep(1.2)
 
+    async def read_control(self) -> bytes:
+        """Read the 512-byte 0004 buffer over the live link (reading ends the device session)."""
+        async with self.lock:
+            if not self.client.connected:
+                await self.client.connect()
+            return await self.client.read_control()
+
     async def send_dvw(self, values, handshake: bool) -> dict:
         if self.demo:
             await asyncio.sleep(0.25)
@@ -310,6 +317,16 @@ async def api_send(body: ValuesBody) -> dict:
         "raw": result.get("frame_hex", ""),
         "read_back": result.get("read_hex", ""),
     }
+
+
+@app.get("/api/read-control")
+async def api_read_control() -> dict:
+    """Read the 512-byte control buffer; note that the device ends the session after a read."""
+    try:
+        data = await lab.read_control()
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return {"length": len(data), "hex": proto.hx(data), "dump": proto.hexdump(data)}
 
 
 @app.get("/api/capture/download")
